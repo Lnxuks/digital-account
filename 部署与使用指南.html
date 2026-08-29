@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AccountHub 部署与使用指南</title>
+<style>
+:root{
+  --bg:#fafaf9; --surface:#ffffff; --fg:#1c1b1a; --muted:#6b6964; --border:#e6e4e0;
+  --accent:#c96442; --accent-deep:#b5573a; --accent-soft:rgba(201,100,66,.09);
+  --good:#2f7d4a; --bad:#b53a2a; --warn:#9a6700;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);
+  font:15px/1.7 "PingFang SC","Hiragino Sans GB","Microsoft YaHei","Source Han Sans SC",-apple-system,"Segoe UI",sans-serif;}
+.ic{fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.wrap{max-width:920px;margin:0 auto;padding:0 22px 70px}
+.hero{padding:52px 0 34px;border-bottom:1px solid var(--border);margin-bottom:34px}
+.hero .kicker{font-size:12.5px;letter-spacing:.08em;color:var(--accent);font-weight:600;margin-bottom:10px}
+.hero h1{margin:0 0 14px;font-size:34px;letter-spacing:-.02em;line-height:1.2}
+.hero p{margin:0;color:var(--muted);max-width:640px}
+.hero .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}
+.tag{font-size:12px;padding:3px 11px;border-radius:999px;border:1px solid var(--border);background:var(--surface);color:var(--muted)}
+h2{font-size:21px;margin:44px 0 6px;letter-spacing:-.01em;display:flex;align-items:center;gap:10px}
+h2 .ic{color:var(--accent)}
+h2+p.lead{color:var(--muted);margin:0 0 18px;font-size:14px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px 22px;margin-bottom:14px}
+code,pre{font-family:"Cascadia Code",Consolas,"JetBrains Mono",monospace}
+code{background:var(--bg);border:1px solid var(--border);border-radius:5px;padding:1px 6px;font-size:.88em}
+pre{background:#211e1b;color:#efe9e2;border-radius:10px;padding:15px 18px;overflow-x:auto;font-size:13px;line-height:1.65;margin:12px 0 0}
+pre b{color:#e8a87c;font-weight:400}
+.steps{position:relative;margin:6px 0 0;padding-left:34px}
+.step{position:relative;padding-bottom:22px;border-left:2px solid var(--border);margin-left:8px;padding-left:22px}
+.step:last-child{border-left-color:transparent;padding-bottom:4px}
+.step::before{content:attr(data-n);position:absolute;left:-13px;top:0;width:24px;height:24px;border-radius:50%;
+  background:var(--accent);color:#fff;font-size:12.5px;display:grid;place-items:center;font-weight:600}
+.step h3{margin:2px 0 6px;font-size:15px}
+.step p{margin:0 0 8px;font-size:13.5px;color:var(--muted)}
+.note{display:flex;gap:10px;align-items:flex-start;background:rgba(154,103,0,.07);border:1px solid rgba(154,103,0,.35);
+  border-radius:10px;padding:11px 14px;font-size:13px;color:#7a5b00;margin-top:12px}
+.note.red{background:rgba(181,58,42,.05);border-color:rgba(181,58,42,.35);color:var(--bad)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px}
+.fcard{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px}
+.fcard h3{margin:0 0 6px;font-size:14.5px;display:flex;align-items:center;gap:8px}
+.fcard h3 .ic{color:var(--accent)}
+.fcard p{margin:0;font-size:13px;color:var(--muted)}
+table{width:100%;border-collapse:collapse;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.twrap{border-radius:12px;overflow-x:auto}
+th,td{text-align:left;padding:9px 14px;border-bottom:1px solid var(--border);font-size:13.5px;vertical-align:top}
+th{font-size:11.5px;color:var(--muted);letter-spacing:.03em;font-weight:500;background:var(--bg)}
+tr:last-child td{border-bottom:none}
+.dot{display:inline-block;width:8px;height:8px;border-radius:3px;margin-right:7px;vertical-align:baseline}
+.formula{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px 22px;font-size:14.5px}
+.formula .f{font-family:Consolas,monospace;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 14px;display:inline-block;margin:8px 0}
+.foot{margin-top:50px;padding-top:18px;border-top:1px solid var(--border);color:var(--muted);font-size:12.5px;display:flex;gap:18px;flex-wrap:wrap}
+@media(max-width:640px){.hero h1{font-size:26px}h2{font-size:18px}}
+</style>
+</head>
+<body>
+<svg style="display:none" aria-hidden="true">
+  <symbol id="g-rocket" viewBox="0 0 24 24"><path d="M12 15c-2 0-3-1-3-3 0-3.5 1.5-7 6-9.5C17.5 4 19 7.5 19 11c0 4-3 7-7 8l-2-4M9 12l-3.5 1L4 16l3-1M9.5 15.5L8 19l3-1.5"/></symbol>
+  <symbol id="g-gauge" viewBox="0 0 24 24"><path d="M4 14a8 8 0 1 1 16 0M12 14l3.5-4"/><path d="M4 19h16"/></symbol>
+  <symbol id="g-list" viewBox="0 0 24 24"><path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"/></symbol>
+  <symbol id="g-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7v5l3.5 2"/></symbol>
+  <symbol id="g-shield" viewBox="0 0 24 24"><path d="M12 3l7 2.8V11c0 4.6-3 7.7-7 9.5-4-1.8-7-4.9-7-9.5V5.8L12 3z"/></symbol>
+  <symbol id="g-key" viewBox="0 0 24 24"><circle cx="7.5" cy="15.5" r="4"/><path d="M10.5 12.5L20 3M15 5l3 3"/></symbol>
+  <symbol id="g-wrench" viewBox="0 0 24 24"><path d="M14.5 6.5a4.5 4.5 0 0 0-6 5.7L3 17.7 6.3 21l5.5-5.5a4.5 4.5 0 0 0 5.7-6L14 13l-3-3 3.5-3.5z"/></symbol>
+</svg>
+
+<div class="wrap">
+  <div class="hero">
+    <div class="kicker">ACCOUNTHUB V1 · 自托管部署指南</div>
+    <h1>个人数字账本<br>部署与使用指南</h1>
+    <p>把会员订阅、年费、水电燃气、API 按量消费和收入记在一处，自动算出每月固定支出、年化支出，以及每笔订阅本期的「剩余价值」。纯 Python 标准库后端 + 单文件前端，一条命令部署到 Debian 13。</p>
+    <div class="tags"><span class="tag">Debian 13</span><span class="tag">systemd 开机自启</span><span class="tag">SQLite 存储</span><span class="tag">公网 :21117</span><span class="tag">可选访问令牌</span></div>
+  </div>
+
+  <h2><svg class="ic" width="19" height="19"><use href="#g-rocket"/></svg>五步部署</h2>
+  <p class="lead">目标：浏览器打开 http://服务器公网IP:21117 即可使用。</p>
+  <div class="card">
+    <div class="steps">
+      <div class="step" data-n="1"><h3>上传并解压</h3><p>把 <code>account-hub.tar.gz</code> 传到服务器（scp / 面板上传均可），解压得到 <code>account-hub/</code> 目录。</p><pre>scp account-hub.tar.gz user@服务器IP:/tmp/
+ssh user@服务器IP
+cd /tmp && tar -xzf account-hub.tar.gz</pre></div>
+      <div class="step" data-n="2"><h3>一键安装</h3><p>脚本会复制文件到 <code>/opt/account-hub</code>，写入 systemd 服务并立即启动、设置开机自启。Debian 13 自带 python3，无需装任何依赖。</p><pre>cd account-hub && sudo bash install.sh</pre></div>
+      <div class="step" data-n="3"><h3>放行 21117 端口</h3><p>系统防火墙和云厂商安全组都要放行 TCP 21117。</p><pre>sudo ufw allow 21117/tcp   # 未启用 ufw 可跳过</pre><div class="note red"><svg class="ic" width="15" height="15" style="margin-top:2px"><use href="#g-key"/></svg><span>公网打不开的第一大原因：云控制台的「安全组 / 防火墙规则」没放行 21117。先在服务器本机 <code>curl http://127.0.0.1:21117/api/health</code> 确认服务正常，再去云控制台加规则。</span></div></div>
+      <div class="step" data-n="4"><h3>浏览器访问</h3><p>打开 <code>http://&lt;公网IP&gt;:21117</code>。首次是空账本：点「载入示例数据」先看效果，之后删掉示例换成自己的项目。</p></div>
+      <div class="step" data-n="5"><h3>开启访问令牌（推荐）</h3><p>服务暴露在公网上，建议加一层口令。令牌存在浏览器里，换设备输入一次即可。</p><pre>echo '你的口令' | sudo tee /opt/account-hub/token.txt</pre></div>
+    </div>
+  </div>
+
+  <h2><svg class="ic" width="19" height="19"><use href="#g-gauge"/></svg>它帮你管什么</h2>
+  <p class="lead">页面从上到下：关键指标 → 即将续费 → 分类占比 → 订阅剩余价值 → 全部项目（增删改查）。</p>
+  <div class="grid">
+    <div class="fcard"><h3><svg class="ic" width="15" height="15"><use href="#g-gauge"/></svg>关键指标</h3><p>本月固定支出、月均收入、每月结余（含年结余预估）、年化支出、在管项目数。</p></div>
+    <div class="fcard"><h3><svg class="ic" width="15" height="15"><use href="#g-clock"/></svg>即将续费</h3><p>未来 30 天内要扣费的项目，按紧急度标注「今天 / 明天 / N 天后」。</p></div>
+    <div class="fcard"><h3><svg class="ic" width="15" height="15"><use href="#g-list"/></svg>分类占比</h3><p>月均支出按 16 类支出分类的环形图与排行，一眼看出钱花在哪。</p></div>
+    <div class="fcard"><h3><svg class="ic" width="15" height="15"><use href="#g-wrench"/></svg>剩余价值</h3><p>每个订阅本期「已用 / 剩余」进度条、剩余价值、日均成本、下次扣费日。</p></div>
+    <div class="fcard"><h3><svg class="ic" width="15" height="15"><use href="#g-shield"/></svg>数据备份</h3><p>一键导出 JSON；换服务器用「导入」整体迁移；也可直接拷贝 SQLite 文件。</p></div>
+    <div class="fcard"><h3><svg class="ic" width="15" height="15"><use href="#g-key"/></svg>访问令牌</h3><p><code>token.txt</code> 放进安装目录即启用，删除即关闭，实时生效不用重启。</p></div>
+  </div>
+
+  <h2><svg class="ic" width="19" height="19"><use href="#g-list"/></svg>费用分类规划</h2>
+  <p class="lead">内置 16 类支出 + 6 类收入；除你点名的订阅、会员、年费、水电煤、API 之外，补齐了这些常被漏掉的项。</p>
+  <div class="twrap"><table>
+    <thead><tr><th>支出分类</th><th>典型项目</th><th>计费建议</th></tr></thead>
+    <tbody>
+      <tr><td><span class="dot" style="background:#b3543a"></span>影音娱乐</td><td>腾讯视频、爱奇艺、Netflix、Spotify、B 站大会员</td><td>多为月付，按扣费日记</td></tr>
+      <tr><td><span class="dot" style="background:#9c5f96"></span>游戏娱乐</td><td>XGP / PS Plus、游戏月卡、买断制游戏</td><td>月卡按月；买断制选「一次性」</td></tr>
+      <tr><td><span class="dot" style="background:#6f7fb8"></span>AI 订阅</td><td>ChatGPT Plus、Claude Pro、Gemini、Cursor</td><td>月付；海外订阅可折算人民币记</td></tr>
+      <tr><td><span class="dot" style="background:#c08a3e"></span>API 按量</td><td>OpenAI API、Claude API、短信、地图、对象存储</td><td>选「按量」，金额填月均预估</td></tr>
+      <tr><td><span class="dot" style="background:#4f8f7d"></span>软件工具</td><td>Office 365、Adobe、JetBrains、Notion、1Password</td><td>月/年付都有，注意年付折扣</td></tr>
+      <tr><td><span class="dot" style="background:#74a3c7"></span>云服务/存储</td><td>iCloud、OneDrive、百度网盘、VPS、域名、CDN</td><td>域名/服务器常为年付</td></tr>
+      <tr><td><span class="dot" style="background:#3f8f96"></span>通讯网络</td><td>手机话费、家庭宽带、流量包</td><td>月付，月初或固定日扣</td></tr>
+      <tr><td><span class="dot" style="background:#d07a3f"></span>水电燃气</td><td>水费、电费、燃气费、取暖费</td><td>金额波动 → 用「按量」记月均</td></tr>
+      <tr><td><span class="dot" style="background:#8d8778"></span>房租物业</td><td>房租、物业费、停车费、车位租金</td><td>月/季付；物业费常按季</td></tr>
+      <tr><td><span class="dot" style="background:#c77e8f"></span>生活会员</td><td>京东 PLUS、淘宝 88VIP、山姆、外卖/打车会员</td><td>多为年付，易忘续费</td></tr>
+      <tr><td><span class="dot" style="background:#5e86a8"></span>出行交通</td><td>公交地铁月卡、打车套餐、机场/高铁贵宾厅</td><td>月卡按月，充值按实际</td></tr>
+      <tr><td><span class="dot" style="background:#6f9a68"></span>保险保障</td><td>百万医疗险、车险、意外险、重疾险</td><td>多为年付，务必记入防断保</td></tr>
+      <tr><td><span class="dot" style="background:#7c86a3"></span>教育学习</td><td>网课会员、知识星球、电子书、题库</td><td>月/年付</td></tr>
+      <tr><td><span class="dot" style="background:#a8a24e"></span>健康健身</td><td>健身房年卡、私教课、体检套餐</td><td>年付大额，看剩余价值很直观</td></tr>
+      <tr><td><span class="dot" style="background:#9c6b4f"></span>金融费用</td><td>信用卡年费、账户管理费、贷款利息、会员费</td><td>年付/月付；刚性支出别漏</td></tr>
+      <tr><td><span class="dot" style="background:#999488"></span>其他支出</td><td>不在以上范围的杂项</td><td>兜底分类</td></tr>
+      <tr><td colspan="3" style="color:var(--muted)">收入分类：工资收入 · 利息理财 · 返现红包 · 副业接单 · 退款退还 · 其他收入</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2><svg class="ic" width="19" height="19"><use href="#g-clock"/></svg>「剩余价值」怎么算</h2>
+  <p class="lead">订阅是预付费：先付钱、后享受。剩余价值回答的是"这个月/这一年，我还剩多少服务没用完"。</p>
+  <div class="card formula">
+    <div class="f">剩余价值 = 每期金额 × 本期剩余天数 ÷ 本期总天数</div>
+    <p style="margin:10px 0 0;font-size:13.5px;color:var(--muted)">本期以「开始日期 + 周期循环」推算：月付按扣费日循环（31 号这类日期在 2 月自动钳制到月末）；年付按开始日期周年循环。日均成本 = 每期金额 ÷ 本期总天数。例：月付 30 元、本月已过 20 天 → 已用 20 元、剩余 10 元、日均 1 元。年付健身房 2380 元用了 150 天 → 剩余价值 ≈ 1403 元，这就是"退卡大概能退多少"的参考。</p>
+  </div>
+
+  <h2><svg class="ic" width="19" height="19"><use href="#g-wrench"/></svg>运维与修改</h2>
+  <p class="lead">常用命令和"想自己改一点"的对照表。</p>
+  <div class="twrap"><table>
+    <thead><tr><th>场景</th><th>做法</th></tr></thead>
+    <tbody>
+      <tr><td>看日志 / 重启</td><td><code>journalctl -u account-hub -f</code> · <code>sudo systemctl restart account-hub</code></td></tr>
+      <tr><td>改端口</td><td>改 service 文件里 <code>Environment=PORT=</code>，再 <code>daemon-reload</code> + 重启</td></tr>
+      <tr><td>备份</td><td>页面「导出」JSON，或拷贝 <code>/opt/account-hub/data/account.db</code></td></tr>
+      <tr><td>改分类 / 颜色 / 图标</td><td><code>static/index.html</code> 顶部 <code>CATS</code> 对象，改完刷新即生效</td></tr>
+      <tr><td>改主题色</td><td><code>index.html</code> 内 <code>:root</code> 的 <code>--accent</code></td></tr>
+      <tr><td>换 HTTPS</td><td>前面套 Caddy/Nginx 反代 <code>127.0.0.1:21117</code>，令牌照常可用</td></tr>
+      <tr><td>彻底卸载</td><td><code>sudo systemctl disable --now account-hub && sudo rm -rf /opt/account-hub /etc/systemd/system/account-hub.service</code></td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="foot">
+    <span>AccountHub V1</span><span>后端纯 Python 标准库 · SQLite</span><span>前端自包含单文件</span><span>公网 :21117</span>
+  </div>
+</div>
+</body>
+</html>
