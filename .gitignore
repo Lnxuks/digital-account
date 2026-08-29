@@ -1,0 +1,12 @@
+# 系统与编辑器
+.DS_Store
+Thumbs.db
+*.swp
+
+# 备份文件
+*.json.bak
+digital-account-backup-*.json
+
+# IDE
+.idea/
+.vscode/
