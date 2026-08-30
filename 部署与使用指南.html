@@ -72,7 +72,8 @@ tr:last-child td{border-bottom:none}
     <div class="kicker">ACCOUNTHUB V1 · 自托管部署指南</div>
     <h1>个人数字账本<br>部署与使用指南</h1>
     <p>把会员订阅、年费、水电燃气、API 按量消费和收入记在一处，自动算出每月固定支出、年化支出，以及每笔订阅本期的「剩余价值」。纯 Python 标准库后端 + 单文件前端，一条命令部署到 Debian 13。</p>
-    <div class="tags"><span class="tag">Debian 13</span><span class="tag">systemd 开机自启</span><span class="tag">SQLite 存储</span><span class="tag">公网 :21117</span><span class="tag">可选访问令牌</span></div>
+    <div class="tags"><span class="tag">Debian 13</span><span class="tag">systemd 开机自启</span><span class="tag">SQLite 存储</span><span class="tag">公网 :21117</span><span class="tag">可选访问令牌</span><span class="tag">建议套 HTTPS 反代</span></div>
+    <p style="margin:14px 0 0;padding:10px 14px;border-left:3px solid var(--accent);background:var(--accent-soft);border-radius:0 8px 8px 0;font-size:13.5px;color:var(--muted)">图文速查版，内容与 <code>README.md</code> 同步维护；两者不一致时以 README 为准。</p>
   </div>
 
   <h2><svg class="ic" width="19" height="19"><use href="#g-rocket"/></svg>五步部署</h2>
@@ -92,7 +93,7 @@ cd /tmp && tar -xzf account-hub.tar.gz</pre></div>
   <h2><svg class="ic" width="19" height="19"><use href="#g-gauge"/></svg>它帮你管什么</h2>
   <p class="lead">页面从上到下：关键指标 → 即将续费 → 分类占比 → 订阅剩余价值 → 全部项目（增删改查）。</p>
   <div class="grid">
-    <div class="fcard"><h3><svg class="ic" width="15" height="15"><use href="#g-gauge"/></svg>关键指标</h3><p>本月固定支出、月均收入、每月结余（含年结余预估）、年化支出、在管项目数。</p></div>
+    <div class="fcard"><h3><svg class="ic" width="15" height="15"><use href="#g-gauge"/></svg>关键指标</h3><p>本月固定支出、年化支出、周期订阅月均、按量月均、在管项目数。</p></div>
     <div class="fcard"><h3><svg class="ic" width="15" height="15"><use href="#g-clock"/></svg>即将续费</h3><p>未来 30 天内要扣费的项目，按紧急度标注「今天 / 明天 / N 天后」。</p></div>
     <div class="fcard"><h3><svg class="ic" width="15" height="15"><use href="#g-list"/></svg>分类占比</h3><p>月均支出按 16 类支出分类的环形图与排行，一眼看出钱花在哪。</p></div>
     <div class="fcard"><h3><svg class="ic" width="15" height="15"><use href="#g-wrench"/></svg>剩余价值</h3><p>每个订阅本期「已用 / 剩余」进度条、剩余价值、日均成本、下次扣费日。</p></div>
@@ -121,7 +122,7 @@ cd /tmp && tar -xzf account-hub.tar.gz</pre></div>
       <tr><td><span class="dot" style="background:#a8a24e"></span>健康健身</td><td>健身房年卡、私教课、体检套餐</td><td>年付大额，看剩余价值很直观</td></tr>
       <tr><td><span class="dot" style="background:#9c6b4f"></span>金融费用</td><td>信用卡年费、账户管理费、贷款利息、会员费</td><td>年付/月付；刚性支出别漏</td></tr>
       <tr><td><span class="dot" style="background:#999488"></span>其他支出</td><td>不在以上范围的杂项</td><td>兜底分类</td></tr>
-      <tr><td colspan="3" style="color:var(--muted)">收入分类：工资收入 · 利息理财 · 返现红包 · 副业接单 · 退款退还 · 其他收入</td></tr>
+      <tr><td colspan="3" style="color:var(--muted)">纯支出账本：只管理周期性费用与订阅，收入类字段已移除（旧数据兼容展示，可随时删除）</td></tr>
     </tbody>
   </table></div>
 

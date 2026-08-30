@@ -1,0 +1,30 @@
+# AccountHub HTTPS 反代示例（Caddy，自动签 Let's Encrypt 证书）
+# 用法：
+#   1. 把 account.example.com 换成你的域名，并解析到服务器公网 IP
+#   2. sudo cp docs/Caddyfile /etc/caddy/Caddyfile && sudo systemctl reload caddy
+#   3. 服务改为只听本机（更安全）：
+#        sudo HOST=127.0.0.1 BEHIND_PROXY=1 bash install.sh
+#      然后防火墙放行 80/443，不再放行 21117
+
+account.example.com {
+	encode gzip
+
+	# 反代到本机 AccountHub
+	reverse_proxy 127.0.0.1:21117 {
+		# 让后端能拿到真实客户端 IP（配合 BEHIND_PROXY=1 的失败限流）
+		header_up X-Forwarded-For {remote_host}
+		header_up X-Forwarded-Proto {scheme}
+	}
+
+	# 简单的安全响应头
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "no-referrer"
+		-Server
+	}
+
+	log {
+		output file /var/log/caddy/account-hub.log
+	}
+}

@@ -1,0 +1,75 @@
+# AccountHub · Docker Compose 部署
+# 用法：
+#   docker compose up -d            # 构建并启动
+#   docker compose logs -f          # 看日志
+#   docker compose down             # 停止（数据卷保留）
+#
+# 启动后访问 http://<服务器IP>:21117
+
+name: account-hub
+
+services:
+  account-hub:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: account-hub:1.1
+    container_name: account-hub
+    restart: unless-stopped
+
+    environment:
+      TZ: Asia/Shanghai            # 影响"今天/下次扣费"的判定，务必与本地时区一致
+      HOST: "0.0.0.0"
+      PORT: "21117"
+      AH_DATA_DIR: /data
+      AH_TRUST_PROXY: "1"          # 挂在反代后面时，按 X-Forwarded-For 做失败限流
+      # TOKEN_FILE: /run/secrets/account_hub_token     # 启用访问令牌时打开
+      # AH_BACKUP_KEEP: "10"                          # 导入前自动快照保留份数
+
+    # 只暴露本机时用 "127.0.0.1:21117:21117"，前面挂反代更安全
+    ports:
+      - "21117:21117"
+
+    volumes:
+      - account-hub-data:/data
+      # - ./token.txt:/run/secrets/account_hub_token:ro   # 令牌文件（宿主机上权限设 600）
+
+    healthcheck:
+      test:
+        ["CMD", "python", "-c",
+         "import os,urllib.request;urllib.request.urlopen('http://127.0.0.1:%s/api/health' % os.environ.get('PORT','21117'), timeout=3)"]
+      interval: 30s
+      timeout: 5s
+      start_period: 10s
+      retries: 3
+
+    # 可选：只读根文件系统（数据只写 /data，日志走 /tmp）
+    # read_only: true
+    # tmpfs:
+    #   - /tmp:size=16m
+
+  # ---------------------------------------------------------------
+  # 可选：HTTPS 反代。把下面整段注释去掉，并把 account.example.com
+  # 换成你的域名（需先解析到本机），再 docker compose up -d caddy。
+  # 同时把上面 ports 改成 "127.0.0.1:21117:21117"，只放行 80/443。
+  # ---------------------------------------------------------------
+  # caddy:
+  #   image: caddy:2-alpine
+  #   container_name: account-hub-caddy
+  #   restart: unless-stopped
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
+  #   environment:
+  #     TZ: Asia/Shanghai
+  #   volumes:
+  #     - ./docs/Caddyfile:/etc/caddy/Caddyfile:ro
+  #     - caddy-data:/data
+  #     - caddy-config:/config
+  #   depends_on:
+  #     - account-hub
+
+volumes:
+  account-hub-data:
+  # caddy-data:
+  # caddy-config:
